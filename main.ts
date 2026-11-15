@@ -76,6 +76,17 @@ if (shots.length < 3) {
   process.stderr.write(`token radar: screenshots/ holds ${shots.length} image${shots.length === 1 ? '' : 's'}: hand in 3, the board, a detail view and a filtered view\n`);
   process.exit(1);
 }
+if (shots.length > SCREENSHOT_CAPS.max) {
+  process.stderr.write(`token radar: screenshots/ holds ${shots.length} images: the gate takes at most ${SCREENSHOT_CAPS.max}\n`);
+  process.exit(1);
+}
+for (const name of shots) {
+  const bytes = statSync(join(out, 'screenshots', name)).size;
+  if (bytes > SCREENSHOT_CAPS.max_bytes) {
+    process.stderr.write(`token radar: screenshots/${name} is ${bytes} bytes: the gate takes at most ${SCREENSHOT_CAPS.max_bytes} per image\n`);
+    process.exit(1);
+  }
+}
 for (const name of shots) {
   if (!IMAGE_NAME.test(name)) {
     process.stderr.write(`token radar: screenshots/${name}: a name is letters, digits and . _ -, 1 to 128 characters\n`);
